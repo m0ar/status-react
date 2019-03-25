@@ -139,12 +139,14 @@ def build_ios_e2e
         scheme: "StatusIm",
         workspace: "ios/StatusIm.xcworkspace",
         configuration: "Release",
-        # Temporary fix for Xcode 10.1
-        xcargs: "-UseModernBuildSystem=N",
         # Simulator apps can't be archived...
         skip_archive: true,
         # ...and we don't need an .ipa file for them, because we use .app directly
-        skip_package_ipa: true
+        skip_package_ipa: true,
+        export_options: {
+          # -UseModernBuildSystem=N is a temporary fix for Xcode 10.1
+          "UseModernBuildSystem": "N"
+        }
     )
 
     zip(

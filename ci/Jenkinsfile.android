@@ -2,7 +2,7 @@ pipeline {
   agent { 
     docker {
       label 'linux'
-      image 'statusteam/nix:jenkins-1.0.0-158e62e1'
+      image 'statusteam/nix:jenkins-1.0.0-150d5721'
       args (
         "-v /home/jenkins/tmp:/var/tmp:rw "+
         "-v /home/jenkins/status-im.keystore:/tmp/status-im.keystore:ro"
@@ -13,7 +13,7 @@ pipeline {
   options {
     timestamps()
     /* Prevent Jenkins jobs from running forever */
-    timeout(time: 35, unit: 'MINUTES')
+    timeout(time: 45, unit: 'MINUTES')
     /* Limit builds retained */
     buildDiscarder(logRotator(
       numToKeepStr: '10',
