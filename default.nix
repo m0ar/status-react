@@ -2,9 +2,9 @@
 { pkgs ? import ((import <nixpkgs> { }).fetchFromGitHub {
     owner = "status-im";
     repo = "nixpkgs";
-    rev = "15623aac6e8cbfa24d4268195bc8eda7303ea2ff";
-    sha256 = "0crjmspk65rbpkl3kqcj7433355i9fy530lhc48g2cz75xjk4sxh";
-  }) { config = { }; },
+    rev = "db492b61572251c2866f6b5e6e94e9d70e7d3021";
+    sha256 = "188r7gbcrxi20nj6xh9bmdf3lbjwb94v9s0wpacl7q39g1fca66h";
+  }) { config = { android_sdk.accept_license = true; }; },
   target-os ? "" }:
 
 with pkgs;

@@ -33,6 +33,9 @@ __toolversion = $(shell $(GIT_ROOT)/scripts/toolversion $(1))
 clean: ##@prepare Remove all output folders
 	git clean -dxf -f
 
+clean-nix: ##@prepare Remove complete nix setup
+	sudo rm -rf /nix ~/.cache/nix
+
 setup: ##@prepare Install all the requirements for status-react
 	@./scripts/setup
 
@@ -93,20 +96,16 @@ prod-build: _ensure-in-nix-shell
 	lein prod-build
 
 prod-build-android: _ensure-in-nix-shell
-	rm ./modules/react-native-status/android/libs/status-im/status-go/local/status-go-local.aar 2> /dev/null || true
 	scripts/prepare-for-platform.sh android
 	lein prod-build-android
 
 prod-build-ios: _ensure-in-nix-shell
-	rm -r ./modules/react-native-status/ios/RCTStatus/Statusgo.framework/ 2> /dev/null || true
 	scripts/prepare-for-platform.sh ios
 	lein prod-build-ios
 
 full-prod-build: _ensure-in-nix-shell ##@build build prod for both Android and iOS
 	./scripts/bundle-status-go.sh ios android
 	$(MAKE) prod-build
-	rm -r ./modules/react-native-status/ios/RCTStatus/Statusgo.framework/ 2> /dev/null || true
-	rm ./modules/react-native-status/android/libs/status-im/status-go/local/status-go-local.aar 2> /dev/null
 
 prod-build-desktop: _ensure-in-nix-shell
 	git clean -qdxf -f ./index.desktop.js desktop/
