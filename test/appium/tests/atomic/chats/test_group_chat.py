@@ -281,3 +281,25 @@ class TestGroupChatMultipleDevice(MultipleDeviceTestCase):
         device_2_chat.add_members_to_group_chat([chat_member['username']])
 
         self.verify_no_errors()
+
+    @marks.testrail_id(5681)
+    @marks.high
+    def test_clear_history_of_group_chat_via_group_view(self):
+        self.create_drivers(2)
+
+        device_1_home, device_2_home = create_users(self.drivers[0], self.drivers[1])
+        chat_name = device_1_home.get_public_chat_name()
+
+        # create and join group chat
+        device_1_chat, device_2_chat = create_and_join_group_chat(device_1_home, device_2_home, chat_name)
+
+        # device 1, device 2: send messages and clear history on device 1
+        for chat in (device_1_chat, device_2_chat):
+            chat.send_message("Message from device: %s" % chat.driver.number)
+            device_1_chat.clear_history_via_group_info()
+
+        # device 1: check that history is deleted
+        if not device_1_chat.empty_public_or_group_chat_message.is_element_present():
+            self.errors.append('Message history is shown')
+
+        self.verify_no_errors()

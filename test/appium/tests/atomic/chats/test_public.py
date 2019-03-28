@@ -139,7 +139,7 @@ class TestPublicChatSingleDevice(SingleDeviceTestCase):
         chat = home_view.join_public_chat('evripidis-middellijn')
 
         try:
-            chat.empty_public_chat_message.wait_for_invisibility_of_element()
+            chat.empty_public_or_group_chat_message.wait_for_invisibility_of_element()
         except TimeoutException:
             self.driver.fail('Empty chat: history is not fetched!')
 
