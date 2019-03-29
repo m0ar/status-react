@@ -58,7 +58,7 @@ case $1 in
   android)
     set -e
     if [ ! -d $GIT_ROOT/node_modules/react-native/android/com/facebook/react/react-native/ ]; then
-      cd $GIT_ROOT/android && ./gradlew react-native-android:installArchives
+      cd $GIT_ROOT/android && gradle react-native-android:installArchives
     fi
     ;;
   ios)

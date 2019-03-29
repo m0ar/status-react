@@ -18,14 +18,14 @@ yarn install
 
 case $TARGET in
   debug)
-    lein do clean, cljsbuild once android && ./android/gradlew ${GRADLE_PROPERTIES} assembleDebug
+    lein do clean, cljsbuild once android && gradle ${GRADLE_PROPERTIES} assembleDebug
     echo "Generated android/app/build/outputs/apk/debug/app-debug.apk"
     exit 1
     ;;
   release)
     STORE_FILE=$(property_gradle 'STATUS_RELEASE_STORE_FILE')
     [[ ! -e "${STORE_FILE/#\~/$HOME}" ]] && echo "Please generate keystore first using ./generate-keystore.sh" && exit 0
-    lein do clean, with-profile prod cljsbuild once android && ./android/gradlew ${GRADLE_PROPERTIES} assembleRelease
+    lein do clean, with-profile prod cljsbuild once android && gradle ${GRADLE_PROPERTIES} assembleRelease
     cecho "Generated @b@blueandroid/app/build/outputs/apk/release/app-release.apk"
     echo
     exit

@@ -4,6 +4,7 @@ with pkgs;
 with stdenv;
 
 let
+  gradle = gradle_4_10;
   status-go = callPackage ./status-go { inherit androidComposition; inherit xcodeWrapper; };
   targetAndroid = {
     "android" = true;
@@ -42,7 +43,7 @@ in
       [ status-go ] ++
       [ bundler ruby ] ++ ## bundler/ruby used for fastlane
       lib.optional targetAndroid [
-        openjdk
+        openjdk gradle
       ];
     shellHook =
       status-go.shellHook +

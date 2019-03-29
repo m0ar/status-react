@@ -63,7 +63,7 @@ fi
 # Install deps
 yarn install --frozen-lockfile
 
-cd android && ./gradlew react-native-android:installArchives && cd ../
+cd android && gradle react-native-android:installArchives && cd ../
 
 # open figwheel in new tab
 tab "clj -R:repl build.clj figwheel --platform ${cljs_build} --ios-device ${device_type}"

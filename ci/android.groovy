@@ -18,7 +18,7 @@ def bundle(type = 'nightly') {
         passwordVariable: 'STATUS_RELEASE_KEY_PASSWORD'
       )
     ]) {
-      utils.nix_sh "./gradlew assembleRelease ${gradleOpt}"
+      utils.nix_sh "gradle assembleRelease ${gradleOpt}"
     }
   }
   def pkg = utils.pkgFilename(type, 'apk')
