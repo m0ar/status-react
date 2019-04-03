@@ -634,7 +634,7 @@
                                      (assoc-in [:hardwallet :pin] {:status      nil
                                                                    :error-label nil}))
                :utils/show-popup {:title   ""
-                                  :content (i18n/label :t/pin-changed {:pin pin})}}
+                                  :content (i18n/label :t/pin-changed)}}
               (navigation/navigate-back))))
 
 (fx/defn on-change-pin-error
