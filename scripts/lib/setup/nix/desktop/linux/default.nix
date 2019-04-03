@@ -14,4 +14,8 @@ in
 
   # Fixes Cgo related build failures (see https://github.com/NixOS/nixpkgs/issues/25959 )
   hardeningDisable = [ "fortify" ];
+
+  shellHook = ''
+    export STATUSREACT_LINUX_BASEIMAGE_PATH="${baseImage}/src"
+  '';
 }

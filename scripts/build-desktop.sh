@@ -209,14 +209,12 @@ function bundleWindows() {
   fi
 
   # TODO this needs to be fixed: status-react/issues/5378
-  local windowsBaseImagePath="$(nix show-derivation -r -f $STATUSREACTPATH | jq -r '.[] | select(.env.name=="StatusIm-Windows-base-image") | .outputs.out.path')/src/"
-
   local top_srcdir=$(joinExistingPath "$STATUSREACTPATH" '.')
   VERSION_MAJOR="$(cut -d'.' -f1 <<<"$VERSION")"
   VERSION_MINOR="$(cut -d'.' -f2 <<<"$VERSION")"
   VERSION_BUILD="$(cut -d'.' -f3 <<<"$VERSION")"
   makensis -Dtop_srcdir=${top_srcdir} \
-           -Dbase_image_dir=${windowsBaseImagePath} \
+           -Dbase_image_dir=${STATUSREACT_WINDOWS_BASEIMAGE_PATH} \
            -DCOMPRESSION_ALGO=${compressionAlgo} \
            -DCOMPRESSION_TYPE=${compressionType} \
            -DVERSION_MAJOR=$VERSION_MAJOR \
@@ -239,8 +237,7 @@ function bundleLinux() {
     rm -rf StatusImAppImage AppDir
 
     # TODO this needs to be fixed: status-react/issues/5378
-    local baseAppImagePath="$(nix show-derivation -r -f $STATUSREACTPATH | jq -r '.[] | select(.env.name=="StatusImAppImage") | .outputs.out.path')/src"
-    cp -r $baseAppImagePath/StatusImAppImage .
+    cp -r ${STATUSREACT_LINUX_BASEIMAGE_PATH}/StatusImAppImage .
     chmod -R +w StatusImAppImage/
 
     mkdir AppDir
@@ -306,16 +303,11 @@ function bundleLinux() {
 
 if is_macos; then
   function getQtFullOutPathFromNixStore() {
-    local qtFullDerivationPath=$(nix show-derivation -f $STATUSREACTPATH/default.nix | jq -r '.[] | .inputDrvs | 'keys' | .[]' | grep qt-full)
-
-    echo $(nix show-derivation $qtFullDerivationPath | jq -r '.[] | .outputs.out.path')
+    echo $QT_PATH
   }
 
   function getQtBaseBinPathFromNixStore() {
-    local qtFullDerivationPath=$(nix show-derivation -f $STATUSREACTPATH/default.nix | jq -r '.[] | .inputDrvs | 'keys' | .[]' | grep qt-full)
-    local qtBaseDerivationPath=$(nix show-derivation $qtFullDerivationPath | jq -r '.[] | .inputDrvs | 'keys' | .[]' | grep qtbase)
-
-    echo $(nix show-derivation $qtBaseDerivationPath | jq -r '.[] | .outputs.bin.path')
+    echo $QT_BASEBIN_PATH
   }
 
   function copyDylibNixDependenciesToPackage() {
@@ -444,8 +436,7 @@ function bundleMacOS() {
     # download prepared package with mac bundle files (it contains qt libraries, icon)
     rm -rf Status.app
     # TODO this needs to be fixed: status-react/issues/5378
-    local baseAppImagePath="$(nix show-derivation -r -f $STATUSREACTPATH | jq -r '.[] | select(.env.name=="StatusImAppBundle") | .outputs.out.path')/src"
-    cp -r $baseAppImagePath/Status.app .
+    cp -r ${STATUSREACT_MACOS_BASEIMAGE_PATH}/Status.app .
     chmod -R +w Status.app/
 
     local contentsPath='Status.app/Contents'
