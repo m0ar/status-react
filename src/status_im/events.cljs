@@ -53,7 +53,8 @@
             [status-im.stickers.core :as stickers]
             [status-im.utils.config :as config]
             [status-im.ui.components.bottom-sheet.core :as bottom-sheet]
-            [status-im.ui.components.react :as react]))
+            [status-im.ui.components.react :as react]
+            [status-im.chat.db :as chat.db]))
 
 ;; init module
 
@@ -715,8 +716,22 @@
 
 (handlers/register-handler-fx
  :chat.ui/fetch-history-pressed
- (fn [cofx [_ chat-id]]
-   (mailserver/fetch-history cofx chat-id 1)))
+ (fn [{:keys [now] :as cofx} [_ chat-id]]
+   (mailserver/fetch-history cofx chat-id
+                             (- (quot now 1000) (* 24 3600)))))
+
+(handlers/register-handler-fx
+ :chat.ui/fill-the-gap
+ (fn [{:keys [db] :as cofx}]
+   (let [mailserver-topics (:mailserver/topics db)
+         chat-id           (:current-chat-id db)
+         topic             (get-in db [:transport/chats chat-id :topic])
+         gap               (chat.db/messages-gap mailserver-topics topic)]
+     (mailserver/fill-the-gap
+      cofx
+      (assoc gap
+             :topic topic
+             :chat-id chat-id)))))
 
 (handlers/register-handler-fx
  :chat.ui/remove-chat-pressed

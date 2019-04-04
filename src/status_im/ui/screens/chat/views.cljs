@@ -70,6 +70,34 @@
   [{{:keys [value]} :row}]
   [message-datemark/chat-datemark value])
 
+(defview gap []
+  (letsubs [in-progress? [:chats/fetching-gap-in-progress?]]
+    [react/view {:align-self          :stretch
+                 :margin-top          24
+                 :margin-bottom       24
+                 :height              48
+                 :align-items         :center
+                 :justify-content     :center
+                 :border-color        colors/gray-light
+                 :border-top-width    1
+                 :border-bottom-width 1
+                 :background-color    :white}
+     [react/touchable-highlight
+      {:on-press (when-not in-progress?
+                   #(re-frame/dispatch [:chat.ui/fill-the-gap]))}
+      [react/view {:flex            1
+                   :align-items     :center
+                   :justify-content :center}
+       (if in-progress?
+         [react/activity-indicator]
+         [react/text
+          {:style {:color colors/blue}}
+          (i18n/label :t/fetch-messages)])]]]))
+
+(defmethod message-row :gap
+  [_]
+  [gap])
+
 (defmethod message-row :default
   [{:keys [group-chat current-public-key modal? row]}]
   [message/chat-message (assoc row
