@@ -1126,8 +1126,11 @@
   (let [tag-was-lost? (= "Tag was lost." (:error error))
         instance-uid (get-in db [:hardwallet :application-info :instance-uid])]
     (if tag-was-lost?
-      {:utils/show-popup {:title   (i18n/label :t/error)
-                          :content (i18n/label :t/tag-was-lost)}}
+      (fx/merge cofx
+                {:db               (assoc-in db [:hardwallet :pin :status] nil)
+                 :utils/show-popup {:title   (i18n/label :t/error)
+                                    :content (i18n/label :t/cannot-read-card)}}
+                (navigation/navigate-to-cofx :hardwallet-connect nil))
       (fx/merge cofx
                 {:hardwallet/get-application-info {:pairing (get-pairing db instance-uid)}
                  :db                              (update-in db [:hardwallet :pin] merge {:status      :error
@@ -1174,9 +1177,19 @@
 (fx/defn on-sign-error
   [{:keys [db] :as cofx} error]
   (log/debug "[hardwallet] sign error: " error)
-  (fx/merge cofx
-            {:db (update-in db [:hardwallet :pin] merge {:status      :error
-                                                         :sign        []
-                                                         :error-label :t/pin-mismatch})}
-            (navigation/navigate-to-cofx :enter-pin nil)
-            (get-application-info (get-pairing db) nil)))
+  (let [tag-was-lost? (= "Tag was lost." (:error error))]
+    (fx/merge cofx
+              (if tag-was-lost?
+                (fx/merge cofx
+                          {:db               (-> db
+                                                 (assoc-in [:hardwallet :on-card-connected] :hardwallet/sign)
+                                                 (assoc-in [:hardwallet :pin :status] nil))
+                           :utils/show-popup {:title   (i18n/label :t/error)
+                                              :content (i18n/label :t/cannot-read-card)}}
+                          (navigation/navigate-to-cofx :hardwallet-connect nil))
+                (fx/merge cofx
+                          {:db (update-in db [:hardwallet :pin] merge {:status      :error
+                                                                       :sign        []
+                                                                       :error-label :t/pin-mismatch})}
+                          (navigation/navigate-to-cofx :enter-pin nil)))
+              (get-application-info (get-pairing db) nil))))
