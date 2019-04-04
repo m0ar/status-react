@@ -205,7 +205,8 @@
                #(when send-command?
                   (commands-sending/send % chat-id send-command? params))
                (navigation/navigate-to-clean
-                (if (contains? #{:wallet-send-transaction :enter-pin :hardwallet-connect} (:view-id db))
+                (if (or (contains? #{:wallet-send-transaction} (:view-id db))
+                        (not (get-in db [:navigation/screen-params :enter-pin :modal?])))
                   :wallet-transaction-sent
                   :wallet-transaction-sent-modal)
                 {})))))
@@ -343,13 +344,14 @@
 (handlers/register-handler-fx
  :wallet.callback/hash-transaction-completed
  (fn [{:keys [db] :as cofx} [_ result]]
-   (let [{:keys [transaction hash]} (:result (types/json->clj result))]
+   (let [{:keys [transaction hash]} (:result (types/json->clj result))
+         modal? (contains? #{:wallet-send-transaction-modal :wallet-sign-message-modal} (:view-id db))]
      (fx/merge cofx
                {:db (-> db
                         (assoc-in [:hardwallet :pin :enter-step] :sign)
                         (assoc-in [:hardwallet :transaction] transaction)
                         (assoc-in [:hardwallet :hash] hash))}
-               (navigation/navigate-to-clean :enter-pin nil)))))
+               (navigation/navigate-to-clean :enter-pin {:modal? modal?})))))
 
 (handlers/register-handler-fx
  :wallet.ui/sign-transaction-button-clicked
